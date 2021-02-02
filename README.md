@@ -6,17 +6,14 @@ Data-EDA-Model
 
 `wget -r -np -nH --user=username --password=password https://media.talkbank.org/dementia/0extra` this contains the ADReSS data
 
-## Environment (we will set up a docker image later)
+## Environment
 
+Build the container
 ```
-conda create -n audio python=3.7
-conda activate audio
-pip install -r requirements.txt
+sudo docker build -t model_container -f dockerfile_model .
+
+docker run --rm --name model_container -v ~/Documents/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container:latest
 ```
 
-```
-ipython kernel install --user --name=audio
-conda activate audio
-jupyter-notebook
-```
+
 ## EDA
