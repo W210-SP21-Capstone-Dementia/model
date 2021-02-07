@@ -71,3 +71,4 @@ wavio==0.0.4
 wcwidth==0.1.8
 Werkzeug==1.0.0
 wrapt==1.12.0
+plotnine==0.7.1
