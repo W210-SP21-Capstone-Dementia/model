@@ -1,0 +1,1 @@
+tell me everything that you see going on in that picture everything that you see happening
