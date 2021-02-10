@@ -30,3 +30,14 @@ Baseline model is saved at `\saved_model\baseline`
 
 
 ## Serving
+
+ARM Server
+```
+docker run --rm -p 8501:8501 -v /Users/zengm71/Documents/Berkeley/W210/W210-SP21-Capstone-Dementia/model/saved_model/base_line:/models/base_line -e MODEL_NAME=base_line -t emacski/tensorflow-serving:2.4.1 &
+```
+Client
+```
+
+curl -o -d '{"files": "/tf/Berkeley/W210/dementia/0extra/ADReSS-IS2020-data 2/train/Full_wave_enhanced_audio/cd/S129.wav"}' \
+-X POST http://localhost:8501/v1/models/base_line:predict
+```

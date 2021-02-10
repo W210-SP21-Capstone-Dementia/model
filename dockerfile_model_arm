@@ -13,3 +13,6 @@ RUN export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 RUN pip3 install pandas==1.1.5 plotnine==0.7.1 kapre==0.3.4
 
 RUN pip3 install opensmile==1.0.1
+
+RUN pip3 install seaborn==0.11.1
+
