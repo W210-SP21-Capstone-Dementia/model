@@ -1,0 +1,15 @@
+FROM flodutot/tensorflow_aarch64:cpu-jupyter-v2.4.1
+
+RUN apt update && apt install -y ffmpeg sox 
+
+RUN apt-get -y install llvm-10*
+
+RUN export LLVM_CONFIG=/usr/bin/llvm-config-10
+
+RUN LLVM_CONFIG=/usr/bin/llvm-config-10 pip3 install llvmlite librosa
+
+RUN export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
+
+RUN pip3 install pandas==1.1.5 plotnine==0.7.1 kapre==0.3.4
+
+RUN pip3 install opensmile==1.0.1
