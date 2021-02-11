@@ -31,13 +31,47 @@ Baseline model is saved at `\saved_model\baseline`
 
 ## Serving
 
+### Local testing 
+Create a bridge network
+`docker network create --driver bridge tf_serving`
+
 ARM Server
 ```
-docker run --rm -p 8501:8501 -v /Users/zengm71/Documents/Berkeley/W210/W210-SP21-Capstone-Dementia/model/saved_model/base_line:/models/base_line -e MODEL_NAME=base_line -t emacski/tensorflow-serving:2.4.1 &
-```
-Client
+docker run --rm -p 8501:8501 -p 8500:8500 \
+	--name model_server --network tf_serving \
+	-v /Users/zengm71/Documents/Berkeley/W210/W210-SP21-Capstone-Dementia/model/saved_model/base_line:/models/base_line \
+	-e MODEL_NAME=base_line \
+	-t emacski/tensorflow-serving:2.4.1 &
 ```
 
-curl -o -d '{"files": "/tf/Berkeley/W210/dementia/0extra/ADReSS-IS2020-data 2/train/Full_wave_enhanced_audio/cd/S129.wav"}' \
--X POST http://localhost:8501/v1/models/base_line:predict
+x86 Server
 ```
+docker run --rm -p 8501:8501 -p 8500:8500 \
+	--name model_server --network tf_serving \
+	-v /Users/zengm71/Documents/Berkeley/W210/W210-SP21-Capstone-Dementia/model/saved_model/base_line:/models/base_line \
+	-e MODEL_NAME=base_line \
+	-t tensorflow/serving:2.4.1 &
+```
+
+Client (if want to test the serving inside the container with a notebook)
+```
+docker run --rm --name model_container \
+	--network tf_serving \
+	-v ~/Documents/:/tf \
+	-p 8888:8888 -p 6006:6006 \
+	-e JUPYTER_ENABLE_LAB=yes \
+	--privileged -ti model_container_arm:latest
+```
+
+Direct request
+```
+docker run --rm --name model_container \
+	--network tf_serving \
+	-v ~/Documents/Berkeley/W210/:/tf \
+	--privileged \
+	-ti model_container_arm:latest \
+	bash /tf/W210-SP21-Capstone-Dementia/model/serving.sh
+```
+
+Remove network
+`docker network rm tf_serving`
