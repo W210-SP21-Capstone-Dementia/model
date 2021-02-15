@@ -1,0 +1,72 @@
+from flask import Flask, render_template,send_file, abort, jsonify
+import json
+import os
+#to run "env FLASK_APP=model_api.py FLASK_ENV=development flask run"
+app = Flask(__name__)
+
+def model_serving_request(filepath, server_ip):
+
+    import tensorflow as tf
+    import numpy as np
+    import json
+    import requests	
+
+    audio_binary = tf.io.read_file(filepath)
+    audio, _ = tf.audio.decode_wav(audio_binary)
+
+    waveform = tf.squeeze(audio, axis=-1)    
+    zero_padding = tf.zeros([10000000] - tf.shape(waveform), dtype=tf.float32)
+    waveform = tf.cast(waveform, tf.float32)
+    equal_length = tf.concat([waveform, zero_padding], 0)
+    
+    spectrogram = tf.signal.stft(equal_length, frame_length=255, frame_step=128)
+    spectrogram = tf.abs(spectrogram)
+    spectrogram = tf.expand_dims(spectrogram, -1)
+
+    spectrogram = tf.expand_dims(spectrogram, axis = 0).numpy().tolist()
+    data = json.dumps({
+        "instances": spectrogram
+        })
+    headers = {"content-type": "application/json"}
+    response = requests.post('http://' + server_ip + ':8501/v1/models/base_line:predict', data=data, headers=headers)
+    result = response.json()['predictions'][0][0]
+    print(result)
+    return result
+
+@app.route("/")
+def default_response():
+    """the default response
+    get:
+        response:
+            200:
+                "This is the default response!"
+            400:
+                Not supported method
+
+
+    """
+    return "This is the default response!\n"
+
+
+@app.route('/getDementiaScore/<string:model>/<string:file_path>')
+def getDementiaScore(model,file_path):
+    """the getDementiaScore request handler
+    post:
+        parameter:
+		    model: string (required)
+		    file_path:string (required)
+        response:
+            200:
+                data = {'dementia_score': int}
+            400:
+                Not supported method
+    """
+    
+    if model == 'base_model':
+
+        score = model_serving_request(file_path, "model_server")
+        data = {'dementia_score': score}
+        return jsonify(data), 200
+    else:
+        return "not supported model!\n", 400
+
