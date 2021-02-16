@@ -1,4 +1,4 @@
-from flask import Flask, render_template,send_file, abort, jsonify
+from flask import Flask, render_template,send_file, abort, jsonify, request
 import json
 import os
 #to run "env FLASK_APP=model_api.py FLASK_ENV=development flask run"
@@ -48,8 +48,8 @@ def default_response():
     return "This is the default response!\n"
 
 
-@app.route('/getDementiaScore/<string:model>/<string:file_path>')
-def getDementiaScore(model,file_path):
+@app.route('/getDementiaScore',methods = ['POST'])
+def getDementiaScore():
     """the getDementiaScore request handler
     post:
         parameter:
@@ -61,11 +61,19 @@ def getDementiaScore(model,file_path):
             400:
                 Not supported method
     """
-    
+    if not request.is_json:
+        return "Content not in JSON!\n",400
+    data_payload = request.get_json()
+
+    if data_payload is None or 'file_path' not in data_payload:
+        return "Missing Input!\n", 400
+    audio_path = data_payload['file_path']
+    model = data_payload['model']
+
     if model == 'base_model':
 
-        score = model_serving_request(file_path, "model_server")
-        data = {'dementia_score': score}
+        #score = model_serving_request(file_path, "model_server")
+        data = {'dementia_score': 24}
         return jsonify(data), 200
     else:
         return "not supported model!\n", 400
