@@ -72,7 +72,7 @@ def getDementiaScore():
 
     if model == 'base_model':
 
-        #score = model_serving_request(file_path, "model_server")
+        score = model_serving_request(file_path, "model_server")
         data = {'dementia_score': 24}
         return jsonify(data), 200
     else:
