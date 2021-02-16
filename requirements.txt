@@ -77,3 +77,4 @@ opensmile==1.0.1
 audeer==1.10.0
 audiofile==0.4.1
 sox==1.4.1
+Flask==1.1.2
