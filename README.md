@@ -92,5 +92,5 @@ model_api
 
 Test API: (make sure the data S043.wav is under /model/data when you start the instance
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/model/data/S043.wav", "model": "base_model"}'  http://localhost:3333/getDementiaScore
+curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/model/data/S043.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore
 ```
