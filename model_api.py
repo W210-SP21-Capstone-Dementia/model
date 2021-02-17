@@ -39,6 +39,8 @@ def model_serving_request(filepath, server_ip):
     response = requests.post('http://' + server_ip + ':8501/v1/models/base_line:predict', data=data, headers=headers)
     result = response.json()['predictions'][0][0]
     print(result)
+    if not filepath.lower().endswith(".wav"):
+        os.remove(input_file)
     return result
 
 @app.route("/")
