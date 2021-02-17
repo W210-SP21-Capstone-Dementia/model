@@ -14,7 +14,7 @@ def model_serving_request(filepath, server_ip):
     
     input_file = filepath
     if not filepath.lower().endswith(".wav"):
-        tmp_name = "tmp-"+datetime.datetime.now()
+        tmp_name = "tmp-"+datetime.now()
         input_file = os.path.dirname(filepath)+"/"+tmp_name+".wav"
         cmd = "ffmpeg -i " + filepath + " " + input_file
         os.system(cmd)
