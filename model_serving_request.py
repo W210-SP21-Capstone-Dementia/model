@@ -4,8 +4,17 @@ def model_serving_request(filepath, server_ip):
     import numpy as np
     import json
     import requests	
-
-    audio_binary = tf.io.read_file(filepath)
+    import os
+    from datetime import datetime
+    
+    input_file = filepath
+    if not filepath.lower().endswith(".wav")
+        tmp_name = "tmp-"+datetime.datetime.now()
+        input_file = os.path.dirname(filepath)+"/"+tmp_name+".wav"
+        cmd = "ffmpeg -i " + filepath + " " + input_file
+        os.system(cmd)
+    
+    audio_binary = tf.io.read_file(input_file)
     audio, _ = tf.audio.decode_wav(audio_binary)
 
     waveform = tf.squeeze(audio, axis=-1)    
