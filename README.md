@@ -5,12 +5,16 @@
 
 `wget -r -np -nH --user=username --password=password https://media.talkbank.org/dementia/0extra` this contains the ADReSS data
 
-mount S3 bucket to `/data` folder (talk to Param for keys)
+Mount S3 bucket to `/data` folder (talk to Param for keys)
 ```
 sudo apt-get install s3fs
 echo ACCESS_KEY:SECRET_KEY > ~/.passwd-s3fs
 chmod 600 .passwd-s3fs
-s3fs w210-audio-files-bucket ~/model/data
+```
+
+Uncomment `allow_other` in `/etc/fuse.conf` and mount with `allow_other` options:
+```
+s3fs w210-audio-files-bucket ~/model/data -o allow_other
 ```
 
 ## Environment
