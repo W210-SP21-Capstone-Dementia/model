@@ -5,13 +5,21 @@
 
 `wget -r -np -nH --user=username --password=password https://media.talkbank.org/dementia/0extra` this contains the ADReSS data
 
+mount S3 bucket to `/data` folder (talk to Param for keys)
+```
+sudo apt-get install s3fs
+echo ACCESS_KEY:SECRET_KEY > ~/.passwd-s3fs
+chmod 600 .passwd-s3fs
+s3fs w210-audio-files-bucket ~/model/data
+```
+
 ## Environment
 
 Build the container X86
 ```
 sudo docker build -t model_container -f dockerfile_model .
 
-docker run --rm --name model_container -v ~/Documents/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container:latest
+docker run --rm --name model_container -v ~/model/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container:latest
 ```
 
 Build the container ARM
@@ -48,7 +56,7 @@ x86 Server
 ```
 docker run --rm -p 8501:8501 -p 8500:8500 \
 	--name model_server --network tf_serving \
-	-v /Users/zengm71/Documents/Berkeley/W210/W210-SP21-Capstone-Dementia/model/saved_model/base_line:/models/base_line \
+	-v ~/model/saved_model/base_line:/models/base_line \
 	-e MODEL_NAME=base_line \
 	-t tensorflow/serving:2.4.1 &
 ```
@@ -92,5 +100,5 @@ model_api
 
 Test API: (make sure the data S043.wav is under /model/data when you start the instance
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/model/data/S043.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore
+curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S043.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore
 ```
