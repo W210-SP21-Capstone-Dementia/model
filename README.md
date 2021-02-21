@@ -83,11 +83,7 @@ sudo docker build -t model_api -f dockerfile_model_api .
 
 Start the docker container instance
 ```
-docker run -d --name flask_api \
---network tf_serving \
--v /home/ubuntu/model/data:/model/data \
--p 5000:5000 \
-model_api
+docker run -d --name flask_api --network tf_serving -v /home/ubuntu/model/data:/home/ubuntu/model/data -p 5000:5000 model_api
 ```
 
 Test API: (make sure the data S043.wav is under /model/data when you start the instance
