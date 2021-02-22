@@ -79,7 +79,8 @@ def getDementiaScore():
 
     if data_payload is None or 'file_path' not in data_payload:
         return "Missing Input!\n", 400
-    audio_path = data_payload['file_path']
+    file_path = data_payload['file_path']
+    audio_path = "/app/model/data/" + os.path.basename(file_path)
     model = data_payload['model']
 
     if model == 'base_model':
