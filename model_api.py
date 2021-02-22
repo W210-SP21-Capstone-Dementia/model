@@ -21,7 +21,9 @@ def model_serving_request(filepath, server_ip):
     
     audio_binary = tf.io.read_file(input_file)
     audio, _ = tf.audio.decode_wav(audio_binary)
-
+    if audio.shape[1] > 1:
+        audio = tf.reshape(audio[:, 0], (audio.shape[0],1))
+        
     waveform = tf.squeeze(audio, axis=-1)    
     zero_padding = tf.zeros([10000000] - tf.shape(waveform), dtype=tf.float32)
     waveform = tf.cast(waveform, tf.float32)
