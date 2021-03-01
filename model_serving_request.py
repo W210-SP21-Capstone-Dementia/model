@@ -1,3 +1,13 @@
+import tensorflow as tf
+def window(x, size, stride):
+    length = int(len(x))
+    if length // size == 0:
+        zero_padding =  tf.zeros([size] - tf.shape(x), dtype=tf.float32)
+        x = tf.cast(x, tf.float32)
+        x = tf.concat([x, zero_padding], 0)
+        length = int(len(x))
+    return tf.map_fn(lambda i: x[i*stride:i*stride+size], tf.range((length-size)//stride+1), dtype=tf.float32)
+    
 def model_serving_request(filepath, server_ip):
 
     import tensorflow as tf
@@ -18,24 +28,23 @@ def model_serving_request(filepath, server_ip):
     audio, _ = tf.audio.decode_wav(audio_binary)
     if audio.shape[1] > 1:
         audio = tf.reshape(audio[:, 0], (audio.shape[0],1))
-
+        
     waveform = tf.squeeze(audio, axis=-1)    
-    zero_padding = tf.zeros([10000000] - tf.shape(waveform), dtype=tf.float32)
-    waveform = tf.cast(waveform, tf.float32)
-    equal_length = tf.concat([waveform, zero_padding], 0)
-    
-    spectrogram = tf.signal.stft(equal_length, frame_length=255, frame_step=128)
-    spectrogram = tf.abs(spectrogram)
-    spectrogram = tf.expand_dims(spectrogram, -1)
-
-    spectrogram = tf.expand_dims(spectrogram, axis = 0).numpy().tolist()
+    rolling_waveform_tensors = window(waveform, size=_*30, stride=_*1)
+    rolling_spectrograms = tf.signal.stft(rolling_waveform_tensors, frame_length=512, frame_step=_)
+    rolling_spectrograms = tf.abs(rolling_spectrograms)
+    rolling_spectrograms = tf.expand_dims(rolling_spectrograms, -1)
+    rolling_spectrograms = rolling_spectrograms.numpy().tolist()
     data = json.dumps({
-        "instances": spectrogram
+        "instances": rolling_spectrograms
         })
     headers = {"content-type": "application/json"}
     response = requests.post('http://' + server_ip + ':8501/v1/models/base_line:predict', data=data, headers=headers)
-    result = response.json()['predictions'][0][0]
+    results = [x[0] for x in response.json()['predictions']]
+    result = sum(results)/len(results)
     print(result)
+    if not filepath.lower().endswith(".wav"):
+        os.remove(input_file)
     return result
 
 if __name__ == "__main__":
