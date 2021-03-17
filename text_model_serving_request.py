@@ -66,11 +66,11 @@ def predict():
 if __name__ == '__main__':
     try:
         # Load persisted model
-        clf = joblib.load('logistic_regression_model.pkl')
+        clf = joblib.load('linear_regression_model.pkl')
         print('model loaded')
 
         # Also we have to load model columns when the application starts.
-        model_columns = joblib.load('logistic_regression_model_columns.pkl')
+        model_columns = joblib.load('linear_regression_model_columns.pkl')
         print('model columns loaded')
     except Exception as e:
         print('Either model or columns are missing')
