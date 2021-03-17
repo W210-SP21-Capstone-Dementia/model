@@ -1,6 +1,8 @@
 import joblib
 import pandas as pd
-from flask import Flask, request, jsonify
+import speech_recognition as sr
+from sklearn.feature_extraction.text import TfidfVectorizer
+from flask import Flask, request, jsonify, redirect
 
 app = Flask(__name__)
 
@@ -11,11 +13,36 @@ clf = None
 # Predict method for API call
 @app.route('/predict', methods=['POST'])
 def predict():
+    # Transcription from https://blog.thecodex.me/speech-recognition-with-python-and-flask/
+    transcript = ""
+    if request.method == "POST":
+        print("FORM DATA RECEIVED")
+
+        if "file" not in request.files:
+            return redirect(request.url)
+
+        file = request.files["file"]
+        if file.filename == "":
+            return redirect(request.url)
+            
+        if file:
+            recognizer = sr.Recognizer()
+            audioFile = sr.AudioFile(file)
+            with audioFile as source:
+                data = recognizer.record(source)
+            transcript = recognizer.recognize_google(data, key=None)
+
     if clf:
         try:
-            json_ = request.json
-            query_df = pd.DataFrame(json_)
-            query = pd.get_dummies(query_df)
+
+            # json_ = request.json
+            # query_df = pd.DataFrame(json_)
+            # query = pd.get_dummies(query_df)
+            vectorizer = TfidfVectorizer()
+            vectorized_text = vectorizer.fit_transform(transcript)
+            vectorizedTextDF = pd.DataFrame(vectorized_text.toarray(), columns=vectorizer.get_feature_names())                        
+
+            query = pd.get_dummies(vectorizedTextDF)
 
             # We have the list of columns persisted, 
             # so we can just replace the missing values with zeros 
