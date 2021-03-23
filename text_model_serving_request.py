@@ -55,7 +55,8 @@ def predict():
             return jsonify({"prediction": list(map(int, prediction))})
         except Exception as e:
 
-            return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+            # return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+            return jsonify({'error': str(e)})
     else:
         print('train first')
         return 'no model here'
@@ -66,12 +67,17 @@ def predict():
 if __name__ == '__main__':
     try:
         # Load persisted model
-        clf = joblib.load('linear_regression_model.pkl')
-        print('model loaded')
+        clf = joblib.load('logistic_regression_model.pkl')
+        print('logistic regression model loaded')
 
         # Also we have to load model columns when the application starts.
-        model_columns = joblib.load('linear_regression_model_columns.pkl')
-        print('model columns loaded')
+        model_columns = joblib.load('logistic_regression_model_columns.pkl')
+        print('logistic regression model columns loaded')
+
+        ### BEGIN TESTING FRAMEWORK
+        test_cc_filepath = './dementia/0extra/ADReSS-IS2020-train/ADReSS-IS2020-data/train/Full_wave_enhanced_audio/cc/S001.wav'
+        app.post('/predict', data=test_cc_filepath)
+        ### END TESTING FRAMEWORK
     except Exception as e:
         print('Either model or columns are missing')
         print(str(e))
