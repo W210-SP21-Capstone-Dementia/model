@@ -10,6 +10,7 @@ app = Flask(__name__)
 model_columns = None
 clf = None
 
+
 # Predict method for API call
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -75,8 +76,8 @@ if __name__ == '__main__':
         print('logistic regression model columns loaded')
 
         ### BEGIN TESTING FRAMEWORK
-        test_cc_filepath = './dementia/0extra/ADReSS-IS2020-train/ADReSS-IS2020-data/train/Full_wave_enhanced_audio/cc/S001.wav'
-        app.post('/predict', data=test_cc_filepath)
+        # test_cc_filepath = './dementia/0extra/ADReSS-IS2020-train/ADReSS-IS2020-data/train/Full_wave_enhanced_audio/cc/S001.wav'
+        # app.post('/predict', data=test_cc_filepath)
         ### END TESTING FRAMEWORK
     except Exception as e:
         print('Either model or columns are missing')
