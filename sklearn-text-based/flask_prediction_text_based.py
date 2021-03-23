@@ -10,7 +10,6 @@ app = Flask(__name__)
 model_columns = None
 clf = None
 
-
 # Predict method for API call
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -35,7 +34,6 @@ def predict():
 
     if clf:
         try:
-
             # json_ = request.json
             # query_df = pd.DataFrame(json_)
             # query = pd.get_dummies(query_df)
@@ -53,11 +51,15 @@ def predict():
             prediction = list(clf.predict(query))
 
             # Converting to int from int64
-            return jsonify({"prediction": list(map(int, prediction))})
+            return_obj = jsonify({"prediction": list(map(int, prediction))})
+            print(return_obj)
+            return return_obj
         except Exception as e:
 
             # return jsonify({'error': str(e), 'trace': traceback.format_exc()})
-            return jsonify({'error': str(e)})
+            return_obj_e = jsonify({'error': str(e)})
+            print(return_obj_e)
+            return return_obj_e
     else:
         print('train first')
         return 'no model here'

@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from flask_prediction import app
+from flask_prediction_text_based import app
 
 def test_file_upload():
     client = app.test_client() # you will need your flask app to create the test_client
