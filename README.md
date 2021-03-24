@@ -101,6 +101,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu
 	--network tf_serving \
 	-v ~/model/saved_model/base_line:/models/base_line \
 	-v ~/model/saved_model/michael/rl_lstm_wn_0314:/models/lstm/1/ \
+	-v ~/model/saved_model/michael/eGeMAPS:/models/smile/1/ \
 	-v ~/model/model_config.config:/models/model_config.config \
 	-t tensorflow/serving:2.4.1 \
 	--model_config_file=/models/model_config.config 
@@ -113,10 +114,17 @@ curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu
 
 * test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore` expect score 27.956016672093025
 
-
 ### LSTM + white noise
 * flask 
 	`docker build -t model_api_lstm -f dockerfile_model_api_lstm .`
 	`docker run --rm -d --name flask_api_lstm --network tf_serving -v /home/ubuntu/model:/app/model -p 5001:5000 model_api_lstm`
 
 * test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5001/getDementiaScore` expect score 26.911125
+
+### Smile 
+* flask 
+	`docker build -t model_api_smile -f dockerfile_model_api_smile .`
+	`docker run --rm -d --name flask_api_smile --network tf_serving -v /home/ubuntu/model:/app/model -p 5002:5000 model_api_smile`
+
+* test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5002/getDementiaScore` expect score 25.18345991930233
+

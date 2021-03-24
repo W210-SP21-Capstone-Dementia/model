@@ -25,6 +25,7 @@ def model_serving_request(filepath, server_ip):
     import opensmile
     from pydub import AudioSegment
     import glob
+    import shutil
 
     input_file = filepath
     if not filepath.lower().endswith(".wav"):
@@ -39,21 +40,23 @@ def model_serving_request(filepath, server_ip):
             newAudio = newAudio + AudioSegment.silent(duration=30000- len(newAudio))
 
     smile = opensmile.Smile(feature_set=opensmile.FeatureSet.eGeMAPSv01b, num_workers=8)
-
+    os. mkdir('/app/model/data/temp_smile/')
     for t1 in list(range(int(len(newAudio)/1000-29))):
         exportAudio = newAudio[t1*1000:(t1 + 30)*1000]
-        exportAudio.export('/tf/data/temp_smile_files/temp' + str(t1) + '.wav' , format="wav")
+        exportAudio.export('/app/model/data/temp_smile/temp' + str(t1) + '.wav' , format="wav")
         
-    to_predict = smile.process_files([glob.glob('/tf/data/temp_smile_files/*.wav')], channel = 0).to_numpy()
-    to_predict = [x[0:88] for x in to_predict].numpy().tolist()
-    os.remove('/tf/data/temp_smile_files/*.wav')                    
+    to_predict = smile.process_files(glob.glob('/app/model/data/temp_smile/*.wav'), channel = 0)
+    to_predict = to_predict.iloc[:, 0:88].to_numpy()
+    
+    shutil.rmtree('/app/model/data/temp_smile')     
+
     data = json.dumps({
-        "instances": to_predict
+        "instances": to_predict.tolist()
         })
     headers = {"content-type": "application/json"}
-    response = requests.post('http://' + server_ip + ':8501/v1/models/lstm/:predict', data=data, headers=headers)
+    response = requests.post('http://' + server_ip + ':8501/v1/models/smile:predict', data=data, headers=headers)
     results = [x[0] for x in response.json()['predictions']]
-    result = sum(results)/len(results)
+    result = sum(results)/len(results) * 30
     print(result)
     if not filepath.lower().endswith(".wav"):
         os.remove(input_file)
@@ -99,7 +102,7 @@ def getDementiaScore():
 
     if model == 'base_model':
 
-        score = model_serving_request(audio_path, "model_server_lstm")
+        score = model_serving_request(audio_path, "model_server")
         data = {'dementia_score': score}
         return jsonify(data), 200
     else:

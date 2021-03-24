@@ -1,6 +1,7 @@
 FROM model_api:latest
 
 WORKDIR /app/model
+RUN pip install --no-cache-dir pydub
 
 ENTRYPOINT [ "python" ]
 
