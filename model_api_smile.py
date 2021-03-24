@@ -40,7 +40,7 @@ def model_serving_request(filepath, server_ip):
             newAudio = newAudio + AudioSegment.silent(duration=30000- len(newAudio))
 
     smile = opensmile.Smile(feature_set=opensmile.FeatureSet.eGeMAPSv01b, num_workers=8)
-    os. mkdir('/app/model/data/temp_smile/')
+    os.mkdir('/app/model/data/temp_smile/')
     for t1 in list(range(int(len(newAudio)/1000-29))):
         exportAudio = newAudio[t1*1000:(t1 + 30)*1000]
         exportAudio.export('/app/model/data/temp_smile/temp' + str(t1) + '.wav' , format="wav")
