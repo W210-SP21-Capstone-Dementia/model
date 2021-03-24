@@ -35,11 +35,16 @@ def model_serving_request(filepath, server_ip):
     rolling_spectrograms = tf.abs(rolling_spectrograms)
     rolling_spectrograms = tf.expand_dims(rolling_spectrograms, -1)
     rolling_spectrograms = rolling_spectrograms.numpy().tolist()
+    print(len(rolling_spectrograms))
+    
     data = json.dumps({
         "instances": rolling_spectrograms
         })
     headers = {"content-type": "application/json"}
     response = requests.post('http://' + server_ip + ':8501/v1/models/base_line:predict', data=data, headers=headers)
+
+    print(response)
+
     results = [x[0] for x in response.json()['predictions']]
     result = sum(results)/len(results)
     print(result)

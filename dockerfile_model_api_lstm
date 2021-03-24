@@ -1,0 +1,7 @@
+FROM model_api:latest
+
+WORKDIR /app/model
+
+ENTRYPOINT [ "python" ]
+
+CMD [ "model_api_lstm.py" ]

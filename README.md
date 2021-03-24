@@ -67,10 +67,10 @@ Direct request
 ```
 docker run --rm --name model_container \
 	--network tf_serving \
-	-v ~/Documents/Berkeley/W210/:/tf \
+	-v ~/model:/tf \
 	--privileged \
-	-ti model_container_arm:latest \
-	bash /tf/W210-SP21-Capstone-Dementia/model/serving.sh
+	-ti model_container:latest \
+	bash /tf/serving.sh
 ```
 
 Remove network
@@ -92,3 +92,31 @@ Test API: (make sure the data S043.wav is under /model/data when you start the i
 ```
 curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S043.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore
 ```
+
+## Deploy multiple models
+* tf_serving, see `model_config.config` for setup
+	```
+	docker run --rm -p 8501:8501 -p 8500:8500 \
+	--name model_server \
+	--network tf_serving \
+	-v ~/model/saved_model/base_line:/models/base_line \
+	-v ~/model/saved_model/michael/rl_lstm_wn_0314:/models/lstm/1/ \
+	-v ~/model/model_config.config:/models/model_config.config \
+	-t tensorflow/serving:2.4.1 \
+	--model_config_file=/models/model_config.config 
+	```
+
+### Baseline
+* flask 
+	`docker build -t model_api -f dockerfile_model_api .`
+	`docker run --rm -d --name flask_api --network tf_serving -v /home/ubuntu/model:/app/model -p 5000:5000 model_api`
+
+* test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5000/getDementiaScore` expect score 27.956016672093025
+
+
+### LSTM + white noise
+* flask 
+	`docker build -t model_api_lstm -f dockerfile_model_api_lstm .`
+	`docker run --rm -d --name flask_api_lstm --network tf_serving -v /home/ubuntu/model:/app/model -p 5001:5000 model_api_lstm`
+
+* test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5001/getDementiaScore` expect score 26.911125

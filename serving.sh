@@ -1,1 +1,1 @@
-python3 /tf/W210-SP21-Capstone-Dementia/model/model_serving_request.py '/tf/dementia/0extra/ADReSS-IS2020-data 2/train/Full_wave_enhanced_audio/cc/S043.wav' 'model_server'
+python3 /tf/model_serving_request.py '/tf/data/train/Full_wave_enhanced_audio/cc/S043.wav' 'model_server'
