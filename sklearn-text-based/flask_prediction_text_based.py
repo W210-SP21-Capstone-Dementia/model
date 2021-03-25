@@ -51,7 +51,7 @@ def getDementiaScore():
             prediction = list(clf.predict(query))
 
             # Converting to int from int64
-            return_obj = jsonify({"dementia_score": map(int, prediction)})
+            return_obj = jsonify({"prediction": list(map(int, prediction))})
             print(return_obj)
             return return_obj
         except Exception as e:
