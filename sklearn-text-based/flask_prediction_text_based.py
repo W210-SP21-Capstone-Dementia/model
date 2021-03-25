@@ -31,7 +31,7 @@ def getDementiaScore():
     with audioFile as source:
         data = recognizer.record(source)
     transcript = recognizer.recognize_google(data, key=None)
-
+    transcript = [transcript]
     if clf:
         try:
             # json_ = request.json
