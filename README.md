@@ -128,3 +128,9 @@ curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu
 
 * test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5002/getDementiaScore` expect score 25.18345991930233
 
+### Text Model
+* flask
+	`docker build -t model_api_text -f dockerfile_model_api_text .`
+	`docker run --rm -d --name flask_api_text -v /home/ubuntu/model:/app/model -p 5003:5000 model_api_text`
+* test 
+	`curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav"}' http://localhost:5003/getDementiaScore`
