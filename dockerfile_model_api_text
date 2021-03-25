@@ -1,0 +1,8 @@
+FROM model_api:latest
+
+WORKDIR /app/model
+
+ENTRYPOINT [ "python" ]
+
+CMD [ "sklearn-text-based/model_api_lstm.py" ]
+

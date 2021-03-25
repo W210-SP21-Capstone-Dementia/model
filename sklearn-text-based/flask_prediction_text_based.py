@@ -11,26 +11,25 @@ model_columns = None
 clf = None
 
 # Predict method for API call
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/getDementiaScore', methods=['POST'])
+def getDementiaScore():
     # Transcription from https://blog.thecodex.me/speech-recognition-with-python-and-flask/
-    transcript = ""
-    if request.method == "POST":
-        print("FORM DATA RECEIVED")
 
-        if "file" not in request.files:
-            return redirect(request.url)
+    if not request.is_json:
+        return "Content not in JSON!\n",400
+    data_payload = request.get_json()
 
-        file = request.files["file"]
-        if file.filename == "":
-            return redirect(request.url)
+    if data_payload is None or 'file_path' not in data_payload:
+        return "Missing Input!\n", 400
+
+    file_path = data_payload['file_path']
             
-        if file:
-            recognizer = sr.Recognizer()
-            audioFile = sr.AudioFile(file)
-            with audioFile as source:
-                data = recognizer.record(source)
-            transcript = recognizer.recognize_google(data, key=None)
+    audio_path = "/app/model/data/" + os.path.basename(file_path)
+    recognizer = sr.Recognizer()
+    audioFile = sr.AudioFile(file_path)
+    with audioFile as source:
+        data = recognizer.record(source)
+    transcript = recognizer.recognize_google(data, key=None)
 
     if clf:
         try:
