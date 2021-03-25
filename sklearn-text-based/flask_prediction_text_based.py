@@ -27,7 +27,7 @@ def getDementiaScore():
             
     audio_path = "/app/model/data/" + os.path.basename(file_path)
     recognizer = sr.Recognizer()
-    audioFile = sr.AudioFile(file_path)
+    audioFile = sr.AudioFile(audio_path)
     with audioFile as source:
         data = recognizer.record(source)
     transcript = recognizer.recognize_google(data, key=None)
