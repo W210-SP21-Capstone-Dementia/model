@@ -70,11 +70,11 @@ def getDementiaScore():
 if __name__ == '__main__':
     try:
         # Load persisted model
-        clf = joblib.load('logistic_regression_model.pkl')
+        clf = joblib.load('/app/model/sklearn-text-based/logistic_regression_model.pkl')
         print('logistic regression model loaded')
 
         # Also we have to load model columns when the application starts.
-        model_columns = joblib.load('logistic_regression_model_columns.pkl')
+        model_columns = joblib.load('/app/model/sklearn-text-based/logistic_regression_model_columns.pkl')
         print('logistic regression model columns loaded')
 
         ### BEGIN TESTING FRAMEWORK
