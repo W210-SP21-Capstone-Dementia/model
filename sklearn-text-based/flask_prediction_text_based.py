@@ -48,10 +48,10 @@ def getDementiaScore():
             # at the time of prediction.
             query = query.reindex(columns=model_columns, fill_value=0)
 
-            prediction = list(clf.predict(query))
+            prediction = float(clf.predict(query))
 
             # Converting to int from int64
-            return_obj = jsonify({"prediction": list(map(int, prediction))})
+            return_obj = jsonify({"prediction": prediction})
             print(return_obj)
             return return_obj
         except Exception as e:
