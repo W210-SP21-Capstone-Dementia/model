@@ -4,5 +4,5 @@ WORKDIR /app/model
 
 ENTRYPOINT [ "python" ]
 
-CMD [ "sklearn-text-based/model_api_lstm.py" ]
+CMD [ "sklearn-text-based/flask_prediction_text_based.py" ]
 
