@@ -3,6 +3,7 @@ import pandas as pd
 import speech_recognition as sr
 from sklearn.feature_extraction.text import TfidfVectorizer
 from flask import Flask, request, jsonify, redirect
+import os
 
 app = Flask(__name__)
 
@@ -11,27 +12,26 @@ model_columns = None
 clf = None
 
 # Predict method for API call
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.route('/getDementiaScore', methods=['POST'])
+def getDementiaScore():
     # Transcription from https://blog.thecodex.me/speech-recognition-with-python-and-flask/
-    transcript = ""
-    if request.method == "POST":
-        print("FORM DATA RECEIVED")
 
-        if "file" not in request.files:
-            return redirect(request.url)
+    if not request.is_json:
+        return "Content not in JSON!\n",400
+    data_payload = request.get_json()
 
-        file = request.files["file"]
-        if file.filename == "":
-            return redirect(request.url)
+    if data_payload is None or 'file_path' not in data_payload:
+        return "Missing Input!\n", 400
+
+    file_path = data_payload['file_path']
             
-        if file:
-            recognizer = sr.Recognizer()
-            audioFile = sr.AudioFile(file)
-            with audioFile as source:
-                data = recognizer.record(source)
-            transcript = recognizer.recognize_google(data, key=None)
-
+    audio_path = "/app/model/data/" + os.path.basename(file_path)
+    recognizer = sr.Recognizer()
+    audioFile = sr.AudioFile(audio_path)
+    with audioFile as source:
+        data = recognizer.record(source)
+    transcript = recognizer.recognize_google(data, key=None)
+    transcript = [transcript]
     if clf:
         try:
             # json_ = request.json
@@ -48,10 +48,10 @@ def predict():
             # at the time of prediction.
             query = query.reindex(columns=model_columns, fill_value=0)
 
-            prediction = list(clf.predict(query))
+            prediction = float(clf.predict(query))
 
             # Converting to int from int64
-            return_obj = jsonify({"prediction": list(map(int, prediction))})
+            return_obj = jsonify({"prediction": prediction})
             print(return_obj)
             return return_obj
         except Exception as e:
@@ -70,11 +70,11 @@ def predict():
 if __name__ == '__main__':
     try:
         # Load persisted model
-        clf = joblib.load('logistic_regression_model.pkl')
+        clf = joblib.load('/app/model/sklearn-text-based/logistic_regression_model.pkl')
         print('logistic regression model loaded')
 
         # Also we have to load model columns when the application starts.
-        model_columns = joblib.load('logistic_regression_model_columns.pkl')
+        model_columns = joblib.load('/app/model/sklearn-text-based/logistic_regression_model_columns.pkl')
         print('logistic regression model columns loaded')
 
         ### BEGIN TESTING FRAMEWORK
@@ -87,4 +87,4 @@ if __name__ == '__main__':
         clf = None
 
     # TODO - change port and host number
-    app.run(host='localhost', port=8080, debug=True)
+    app.run(debug=True,host='0.0.0.0')
