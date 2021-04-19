@@ -11,14 +11,14 @@ Build the container X86
 ```
 sudo docker build -t model_container -f dockerfile_model .
 
-docker run --rm --name model_container -v ~/model/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container:latest
+docker run --rm --network tf_serving --name model_container -v ~/model/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container:latest
 ```
 
 Build the container ARM
 ```
 sudo docker build -t model_container_arm -f dockerfile_model_arm .
 
-docker run --rm --name model_container -v ~/Documents/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container_arm:latest
+docker run --rm --network tf_serving --name model_container -v ~/Documents/:/tf -p 8888:8888 -p 6006:6006 -e JUPYTER_ENABLE_LAB=yes --privileged -ti model_container_arm:latest
 ```
 
 ## EDA
@@ -102,6 +102,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu
 	-v ~/model/saved_model/base_line:/models/base_line \
 	-v ~/model/saved_model/michael/rl_lstm_wn_0314:/models/lstm/1/ \
 	-v ~/model/saved_model/michael/eGeMAPS:/models/smile/1/ \
+	-v ~/model/saved_model/michael/BERT:/models/bert/1/ \
 	-v ~/model/model_config.config:/models/model_config.config \
 	-t tensorflow/serving:2.4.1 \
 	--model_config_file=/models/model_config.config 
@@ -117,20 +118,28 @@ curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu
 ### LSTM + white noise
 * flask 
 	`docker build -t model_api_lstm -f dockerfile_model_api_lstm .`
-	`docker run --rm -d --name flask_api_lstm --network tf_serving -v /home/ubuntu/model:/app/model -p 5001:5000 model_api_lstm`
+	`docker run --rm --network tf_serving -d --name flask_api_lstm --network tf_serving -v /home/ubuntu/model:/app/model -p 5001:5000 model_api_lstm`
 
 * test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5001/getDementiaScore` expect score 26.911125
 
 ### Smile 
 * flask 
 	`docker build -t model_api_smile -f dockerfile_model_api_smile .`
-	`docker run --rm -d --name flask_api_smile --network tf_serving -v /home/ubuntu/model:/app/model -p 5002:5000 model_api_smile`
+	`docker run --rm --network tf_serving -d --name flask_api_smile --network tf_serving -v /home/ubuntu/model:/app/model -p 5002:5000 model_api_smile`
 
 * test `curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}'  http://localhost:5002/getDementiaScore` expect score 25.18345991930233
 
 ### Text Model
 * flask
 	`docker build -t model_api_text -f dockerfile_model_api_text .`
-	`docker run --rm -d --name flask_api_text -v /home/ubuntu/model:/app/model -p 5003:5000 model_api_text`
+	`docker run --rm -d --network tf_serving --name flask_api_text -v /home/ubuntu/model:/app/model -p 5003:5000 model_api_text`
 * test 
 	`curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav"}' http://localhost:5003/getDementiaScore`
+
+## Text BERT Model
+* flask
+	`docker build -t model_api_text_bert -f dockerfile_model_api_text_bert .`
+	`docker run --network tf_serving --rm -d --name flask_api_text_bert -v /home/ubuntu/model:/app/model -p 5004:5000 model_api_text_bert`
+* test 
+	`curl -X POST -H "Content-Type: application/json" -d '{"file_path": "/home/ubuntu/model/data/S041.wav", "model": "base_model"}' http://localhost:5004/getDementiaScore` expect score 25.4926872
+
