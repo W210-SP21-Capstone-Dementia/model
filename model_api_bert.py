@@ -22,7 +22,7 @@ def silence_based_conversion(path, wav_file):
     filepath = input_file
     print(filepath)
     if not filepath.lower().endswith(".wav"):
-        tmp_name = "tmp-"+datetime.now().strftime("%Y%m%d-%H%M%S")
+        tmp_name = "tmp-bert"+datetime.now().strftime("%Y%m%d-%H%M%S")
         input_file = os.path.dirname(filepath)+"/"+tmp_name+".wav"
         cmd = "ffmpeg -i " + filepath + " " + input_file
         wav_file = tmp_name+".wav"
