@@ -21,7 +21,7 @@ def model_serving_request(filepath, server_ip):
     import json
     import requests	
     import os
-    from datetime import datetime
+    from datetime import datetime, timedelta
     import opensmile
     from pydub import AudioSegment
     import glob
@@ -46,6 +46,18 @@ def model_serving_request(filepath, server_ip):
         exportAudio.export('/app/model/data/temp_smile/temp' + str(t1) + '.wav' , format="wav")
         
     to_predict = smile.process_files(glob.glob('/app/model/data/temp_smile/*.wav'), channel = 0)
+    # newAudio.export('/app/model/data/temp_smile/export.wav' , format="wav")
+    # for t1 in list(range(int(len(newAudio)/1000-29))):
+    #     if t1 == 0:
+    #         to_predict = smile.process_file('/app/model/data/temp_smile/export.wav', 
+    #                                         start = timedelta(seconds=0), 
+    #                                         end = timedelta(seconds=30), 
+    #                                         channel=0)
+    #     else: 
+    #         to_predict = to_predict.append(smile.process_file('/app/model/data/temp_smile/export.wav', 
+    #                                         start = timedelta(seconds=t1), 
+    #                                         end = timedelta(seconds=t1+30), 
+    #                                         channel=0))
     to_predict = to_predict.iloc[:, 0:88].to_numpy()
     
     shutil.rmtree('/app/model/data/temp_smile')     

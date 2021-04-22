@@ -14,8 +14,20 @@ r = sr.Recognizer()
 # a function that splits the audio file into chunks 
 # and applies speech recognition 
 def silence_based_conversion(path, wav_file): 
+    import os
+    from datetime import datetime
     text_df = pd.DataFrame()
-  
+
+    input_file = path + wav_file
+    filepath = input_file
+    print(filepath)
+    if not filepath.lower().endswith(".wav"):
+        tmp_name = "tmp-"+datetime.now().strftime("%Y%m%d-%H%M%S")
+        input_file = os.path.dirname(filepath)+"/"+tmp_name+".wav"
+        cmd = "ffmpeg -i " + filepath + " " + input_file
+        wav_file = tmp_name+".wav"
+        os.system(cmd)
+
     # open the audio file stored in 
     # the local system as a wav file. 
     song = AudioSegment.from_wav(path + wav_file) 
@@ -132,6 +144,8 @@ def silence_based_conversion(path, wav_file):
   
         i += 1
     shutil.rmtree(path + 'bert_audio_chunks')     
+    if not filepath.lower().endswith(".wav"):
+        os.remove(input_file)
     return transcript
 
 def model_serving_request(transcript, server_ip):
