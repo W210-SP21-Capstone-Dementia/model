@@ -137,3 +137,6 @@ data/*
 vggish_model.ckpt
 vggish_model_weights.pkl
 vggish_pca_params.npz!
+
+# env
+.DS_Store
