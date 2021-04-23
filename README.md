@@ -1,6 +1,6 @@
 # Cogtition Tracker
 
-Please see our website and contracts at https://cognitiontracker.com/. 
+Please see our website and contacts at https://cognitiontracker.com/. 
 
 The repo archives the work for capstone project at Berkeley MIDS program. It's structured as such:
 * `00_data`: folder for data downloaded from Dementia Bank (not included in the repo) as well as prediction results saved from notebooks. 
